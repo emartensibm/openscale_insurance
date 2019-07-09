@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Open Insurance</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<div class="app">
+    <div class="fullscreen-div">
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+            <a class="navbar-brand" href="/"><img class="logo" src="/static/img/open-ins-logo.png"/></a>
+        </nav>
+        <div class="container">
+            <div class="row">
+                <div class="col-3 sidebar-column">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Driver Profile</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{driver["first_name"]}} {{driver["last_name"]}}</h6>
+                            <img class="profile-pic" src="/static/img/blank-profile.png" />
+                            <p class="card-text">
+                                <img class="claim-icon" src="/static/img/phone-icon.svg"/>
+                                {{driver["phone"]}}
+                            </p>
+                            <p>
+                                <img class="claim-icon" src="/static/img/email-icon.svg"/>
+                                <a href={"mailto:" + driver.EMAIL}>{{driver["email"]}}</a>
+                            </p>
+                            <p class="card-text">
+                                <strong>Drivers License:</strong> {{driver["license_state"]}}<br/>
+                                <strong>Expires:</strong> {{driver["license_expiry"]}}
+                            </p>
+                            <a href="#" class="card-link">Details...</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Policy Details</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{driver["policy_vehicle"]}}</h6>
+                            <p class="card-text">
+                                <strong>Member Since:</strong> {{driver["member_since"]}}<br/>
+                                <strong>Expiration:</strong> {{driver["policy_expiry"]}}<br/>
+                                <strong>Initial Odometer:</strong> {{driver["initial_odo"]}}<br/>
+                                {% if driver["low_mileage"] == "True" %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" checked/>
+                                        <label class="form-check-label" for="inlineCheckbox1">Low Mileage Use</label>
+                                    </div>
+                                {% else %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" />
+                                        <label class="form-check-label" for="inlineCheckbox1">Low Mileage Use</label>
+                                    </div>
+                                {% endif %}
+                            </p>
+                            <a href="#" class="card-link">Details...</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div class="row content-row">
+                        <div class="card container-fluid">
+                            <div class="card-body">
+                                <h5 class="card-title">Incident Summary</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">Cause: {{driver["incident_description"]}}</h6>
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col">
+                                            <p>
+                                                <strong>Loss Event Time:</strong> {{driver["loss_event_time"]}}<br/>
+                                                <strong>Claim Filed:</strong> {{driver["claim_init_time"]}}<br/>
+                                                <strong>Claim Amount:</strong> ${{driver["claim_amount"]}}
+                                            </p>
+                                        </div>
+                                        <div class="col">
+                                            <p>
+                                                <strong>Odometer Reading:</strong> {{driver["odometer_at_loss"]}}<br/>
+                                                <strong>Claims at Time of Loss:</strong> {{driver["claims_at_loss_date"]}}
+                                                {% if driver["police_report"] == "True" -%}
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" checked/>
+                                                        <label class="form-check-label" for="inlineCheckbox2">Police Report Filed</label>
+                                                    </div>
+                                                {%- else -%}
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" />
+                                                        <label class="form-check-label" for="inlineCheckbox2">Police Report Filed</label>
+                                                    </div>
+                                                {%- endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="#" class="card-link">Details...</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row content-row">
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">AI Fraud Detection</h5>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div>
+                                                {% if prediction["value"] == '0' %}
+                                                    <h6 class="card-subtitle mb-2 text-muted">Fraud Unlikely</h6>
+                                                    <img class="status-image" src="/static/img/green-checkmark.svg" />
+                                                {% else %}
+                                                    <h6 class="card-subtitle mb-2 text-muted">Fraud Likely</h6>
+                                                    <img class="status-image" src="/static/img/red-ex.svg" />
+                                                {% endif %}
+                                                <p class="card-text">
+                                                    <strong>Confidence: </strong>{{prediction["probability"]}}%<br/>
+                                                    <strong>Contributing Factors:</strong>
+                                                    <ul>
+                                                        {% for factor in factors %}
+                                                            <li class="factor-bullet">{{factor["name"]}} ({{factor["weight"]}}%)</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a href="#" class="card-link" data-toggle="modal" data-target="#fraud-modal">Details...</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Weather Data</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">Conditions at time of incident:</h6>
+                                    <div class="container">
+                                        <img id="weather-icon" src="/static/img/wicon/{{driver['weather_icon']}}.svg"/>
+                                        <h3 id="weather-title">{{driver['weather_title']}}</h3>
+                                    </div>
+                                    <div class="container">
+                                        <ul>
+                                            <li class="factor-bullet"><strong>Temp:</strong> {{driver['temp']}} degrees</li>
+                                            <li class="factor-bullet"><strong>Hourly precip:</strong> {{driver['precip']}} inches</li>
+                                            <li class="factor-bullet"><strong>Visibility:</strong> {{driver['visibility']}} miles</li>
+                                            <li class="factor-bullet"><strong>Driving Difficulty Index:</strong> {{driver['driving_difficulty']}}%</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Map Data</h5>
+                            <img src="/static/img/{{driver['claim_id']}}.png" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" tabIndex="-1" role="dialog" id="fraud-modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Prediction Explanation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <p>
+                                {% if prediction["value"] == '0' %}
+                                    <strong>Fraud Unlikely</strong> ({{prediction['probability']}}% confidence)
+                                {% else %}
+                                    <strong>Fraud Likely</strong> ({{prediction['probability']}}% confidence)
+                                {% endif %}
+                            </p>
+                            <h5>Supporting Factors</h5>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Feature</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Influence</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for factor in prediction['explanation'] %}
+                                    {% if factor['weight'] > 0 -%}
+                                        <tr>
+                                            <td>{{factor['feature_name']}}</td>
+                                            <td>
+                                                {% for feature in feature_values -%}
+                                                    {% if feature['name'] == factor['feature_name'] %}
+                                                        {% if feature['value'] == '1' %}
+                                                            <strong>True</strong>
+                                                        {% else %}
+                                                            <strong>False</strong>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>{{(factor['weight'])|round(3)}}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor -%}
+                                </tbody>
+                            </table>
+                            <h5>Opposing Factors</h5>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Feature</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Influence</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for factor in prediction['explanation'] %}
+                                    {% if factor['weight'] < 0 -%}
+                                        <tr>
+                                            <td>{{factor['feature_name']}}</td>
+                                            <td>
+                                                {% for feature in feature_values -%}
+                                                    {% if feature['name'] == factor['feature_name'] %}
+                                                        {% if feature['value'] == '1' %}
+                                                            <strong>True</strong>
+                                                        {% else %}
+                                                            <strong>False</strong>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>{{(factor['weight'])|round(3)}}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor -%}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div>
+                            <p>Was this prediction accurate?</p><br/>
+                        </div>
+                        <form id="attribute-values">
+                            {% for feature in feature_values -%}
+                                <input type="hidden" name="{{feature['name']}}" value="{{feature['value']}}">
+                            {% endfor -%}
+                        </form>
+                        <button type="button" class="btn btn-primary">Yes</button>
+                        <button type="button" class="btn btn-danger">No</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!--    <FraudModal prediction={null}/>-->
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="/static/js/main.js"></script>
+</body>
+</html>

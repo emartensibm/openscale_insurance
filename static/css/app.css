@@ -1,0 +1,231 @@
+body {
+
+}
+
+nav {
+    background-color: #003555;
+}
+
+img.logo {
+    max-height: 40px;
+    width: auto;
+}
+
+img.car {
+    width: auto;
+    max-height: 175px;
+}
+
+p.watson {
+    float: right;
+    color: ghostwhite;
+    background-color: #447999;
+    display: inline-block;
+    width: 80%;
+    padding: 10px;
+}
+
+p.user {
+    color: #003555;
+    background-color: ghostwhite;
+    display: inline-block;
+    width: 80%;
+    padding: 10px;
+}
+
+div.message-list-box {
+    padding-bottom: 80px;
+    overflow: auto;
+    overflow-y: scroll;
+}
+
+/*div.message-input-form {*/
+    /*background-color: #447999;*/
+/*}*/
+
+div#mapid {
+    height: 180px;
+}
+
+.app {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+}
+
+.form-control {
+    margin-right: 10px;
+}
+
+div.details-container {
+    display: flex;
+    flex-direction: column;
+}
+
+img.claim-icon {
+    max-width: 20px;
+    height: auto;
+    float: left;
+    margin-right: 5px;
+}
+
+img.profile-pic {
+    max-width: 125px;
+    margin-bottom: 15px;
+}
+
+div.form-div {
+    overflow: auto;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+}
+
+div.form-container {
+    width: 70%;
+}
+
+div.agent-div {
+    overflow: auto;
+    height: 100%;
+}
+
+img.car {
+    width: auto;
+    max-height: 175px;
+}
+
+label > input{ /* HIDE RADIO */
+    visibility: hidden; /* Makes input not-clickable */
+    position: absolute; /* Remove input from document flow */
+}
+label > input + img{ /* IMAGE STYLES */
+    cursor:pointer;
+    border:2px solid transparent;
+}
+label > input:checked + img{ /* (RADIO CHECKED) IMAGE STYLES */
+    border:4px solid #003555;
+}
+
+.leaflet-container {
+    height: 300px;
+    width: 100%;
+}
+
+div#adjust-container {
+    display: flex;
+    flex-direction: row;
+}
+
+div#adjust-right-container {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+}
+
+div#adjust-left-container {
+    width: 30%;
+}
+
+div.adjust-top-right-container {
+    display: flex;
+    flex-direction: row;
+}
+
+div.flexed-row {
+    display: flex;
+    flex-direction: row;
+}
+
+#weather-icon {
+    float: left;
+    max-width: 80px;
+    height: auto;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+img.car-thumb {
+    max-width: 100px;
+    float: left;
+    height: auto;
+}
+
+img.status-image {
+    max-width: 75px;
+    height: auto;
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 15px;
+}
+
+div.half-div {
+    width: 50%;
+}
+
+div.centered-container {
+    display: flex;
+    justify-content: center;
+    height: 350px;
+    align-items: center;
+}
+
+div.login-form-container {
+    width: 80%;
+    border: darkblue;
+}
+
+div#phone-div {
+    width: 50%;
+    height: 100%;
+    border-radius: 25px;
+    -moz-border-radius: 15px;
+    border: 2px solid #000;
+    margin-left: 300px;
+}
+
+div.fullscreen-div {
+    padding-top: 80px;
+    height: 100%;
+    overflow: auto;
+}
+
+div.phone-header {
+    background-color: #003555;
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
+    width: 100%;
+    height: 60px;
+}
+
+#policy-span {
+    float: right;
+}
+
+.adjust-navbar {
+    background-color: #4e8fb0!important;
+    color: #f0f0f0!important;
+    margin-bottom: 10px!important;
+}
+
+li.factor-bullet {
+    margin-left: 75px;
+}
+
+div.card {
+    border: none;
+}
+
+div.sidebar-column {
+    border-right: 1px solid rgba(0,0,0,.125);
+}
+
+div.content-row {
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
