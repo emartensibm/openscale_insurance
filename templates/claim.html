@@ -304,29 +304,36 @@
                                 {% endfor -%}
                                 </tbody>
                             </table>
+                            <hr/>
+                            <h5>Submit Feedback</h5>
+                            <form id="attribute-values" action="/store_feedback" method="post">
+                                <input type="hidden" name="claim_id" value="{{claim_id}}">
+                                {% for feature in feature_values -%}
+                                    <input type="hidden" name="{{feature['name']}}" value="{{feature['value']}}">
+                                {% endfor -%}
+                                <div class="form-group">
+                                    <label for="feedback-select">Was this prediction accurate?</label>
+                                    <select class="form-control" id="feedback-select" name="FLAG_FOR_FRAUD_INV">
+                                        <option value={{prediction["value"]}}>Yes</option>
+                                        <option
+                                                {% if prediction["value"] == '0' -%}
+                                                    value="1"
+                                                {%- else -%}
+                                                    value="0"
+                                                {%- endif -%}
+                                        >No</option>
+                                    </select>
+                                </div>
+                                <input type="submit" class="btn btn-primary">
+                            </form>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <div>
-                            <p>Was this prediction accurate?</p><br/>
-                        </div>
-                        <form id="attribute-values">
-                            {% for feature in feature_values -%}
-                                <input type="hidden" name="{{feature['name']}}" value="{{feature['value']}}">
-                            {% endfor -%}
-                        </form>
-                        <button type="button" class="btn btn-primary">Yes</button>
-                        <button type="button" class="btn btn-danger">No</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script src="/static/js/main.js"></script>
 </body>
 </html>

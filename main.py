@@ -1,7 +1,8 @@
-from flask import Flask, render_template, json, request
+from flask import Flask, render_template, json, request, redirect, url_for
 from flask_cors import CORS, cross_origin
 from ibm_ai_openscale import APIClient
 from ibm_ai_openscale.utils import get_instance_guid
+from ibm_ai_openscale.supporting_classes.enums import FeedbackFormat
 import pandas as pd
 import os
 
@@ -48,7 +49,7 @@ def index():
 
 
 @app.route('/claim/<claim_id>')
-def profile(claim_id):
+def claim(claim_id):
     connect_wos_client()
 
     explain_table = subscription.explainability.get_table_content()
@@ -69,22 +70,28 @@ def profile(claim_id):
 
         for driver in driver_data:
             if driver["claim_id"] == claim_id:
-                return render_template('claim.html', driver=driver, prediction=prediction, factors=factors, feature_values=feature_values, contrastive=contrastive)
+                return render_template('claim.html', driver=driver, prediction=prediction, factors=factors, feature_values=feature_values, contrastive=contrastive, claim_id=claim_id)
         return "Claim ID not found"
     except IndexError:
         pass
 
 
-@app.route('/store_feedback_positive', methods=['POST'])
-def store_feedback_positive():
-    print(request.form)
-    pass
-
-
-@app.route('/store_feedback_negative', methods=['POST'])
-def store_feedback_negative():
-    print(request.form)
-    pass
+@app.route('/store_feedback', methods=['POST'])
+def store_feedback():
+    global subscription
+    print('Storing feedback for claim', request.form.get('claim_id'))
+    fields = ['SUSPICIOUS_CLAIM_TIME','EXPIRED_LICENSE','LOW_MILES_AT_LOSS','EXCESSIVE_CLAIM_AMOUNT','TOO_MANY_CLAIMS','NO_POLICE','FLAG_FOR_FRAUD_INV']
+    SUSPICIOUS_CLAIM_TIME = request.form.get('SUSPICIOUS_CLAIM_TIME')
+    EXPIRED_LICENSE = request.form.get('EXPIRED_LICENSE')
+    LOW_MILES_AT_LOSS = request.form.get('LOW_MILES_AT_LOSS')
+    EXCESSIVE_CLAIM_AMOUNT = request.form.get('EXCESSIVE_CLAIM_AMOUNT')
+    TOO_MANY_CLAIMS = request.form.get('TOO_MANY_CLAIMS')
+    NO_POLICE = request.form.get('NO_POLICE')
+    FLAG_FOR_FRAUD_INV = request.form.get('FLAG_FOR_FRAUD_INV')
+    data = [SUSPICIOUS_CLAIM_TIME,EXPIRED_LICENSE,LOW_MILES_AT_LOSS,EXCESSIVE_CLAIM_AMOUNT,TOO_MANY_CLAIMS,NO_POLICE,FLAG_FOR_FRAUD_INV]
+    subscription.feedback_logging.store([data], fields=fields, feedback_format=FeedbackFormat.WML)
+    subscription.feedback_logging.show_table()
+    return redirect(url_for('claim', claim_id=request.form.get('claim_id')))
 
 
 driver_data = json.load(open(os.path.join(app.root_path, 'data.json')))
