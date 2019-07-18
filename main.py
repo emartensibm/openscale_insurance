@@ -56,6 +56,7 @@ def profile(claim_id):
         raw_data = explain_table.loc[explain_table.transaction_id == claim_id + '-1'].to_dict(orient="list")['explanation'][0]['entity']
         predictions = raw_data['predictions']
         feature_values = raw_data['input_features']
+        contrastive = raw_data['contrastive_explanations']
         prediction = None
         for possibility in predictions:
             if "probability" in possibility and possibility["probability"] > 0.50:
@@ -68,7 +69,7 @@ def profile(claim_id):
 
         for driver in driver_data:
             if driver["claim_id"] == claim_id:
-                return render_template('claim.html', driver=driver, prediction=prediction, factors=factors, feature_values=feature_values)
+                return render_template('claim.html', driver=driver, prediction=prediction, factors=factors, feature_values=feature_values, contrastive=contrastive)
         return "Claim ID not found"
     except IndexError:
         pass

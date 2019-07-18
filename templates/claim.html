@@ -107,21 +107,29 @@
                                         <div class="col-12">
                                             <div>
                                                 {% if prediction["value"] == '0' %}
-                                                    <h6 class="card-subtitle mb-2 text-muted">Fraud Unlikely</h6>
                                                     <img class="status-image" src="/static/img/green-checkmark.svg" />
-                                                {% else %}
+                                                    <p class="card-text">The model predicts <strong>Fraud Unlikely</strong> with
+                                                        {{prediction["probability"]}}% confidence.
+                                                {% else -%}
                                                     <h6 class="card-subtitle mb-2 text-muted">Fraud Likely</h6>
                                                     <img class="status-image" src="/static/img/red-ex.svg" />
-                                                {% endif %}
-                                                <p class="card-text">
-                                                    <strong>Confidence: </strong>{{prediction["probability"]}}%<br/>
-                                                    <strong>Contributing Factors:</strong>
-                                                    <ul>
-                                                        {% for factor in factors %}
-                                                            <li class="factor-bullet">{{factor["name"]}} ({{factor["weight"]}}%)</li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </p>
+                                                    <p class="card-text">The model predicts <strong>Fraud Likely</strong> with
+                                                        {{prediction["probability"]}}% confidence.
+                                                {% endif -%}
+                                                    The following features were most important in determining this prediction:
+                                                        {% for factor in factors -%}
+                                                            {%- if loop.index < loop.length -%}
+                                                                {%- if loop.index > 1 -%}
+                                                                    ,&nbsp;
+                                                                {%- endif -%}
+                                                            {%- else -%}
+                                                                {%- if loop.index > 1 -%}
+                                                                    &nbsp;and&nbsp;
+                                                                {%- endif -%}
+                                                            {%- endif -%}
+                                                            {{factor["name"]}} ({{factor["weight"]}}%)
+                                                        {%- endfor -%}.
+                                                    </p>
                                             </div>
                                         </div>
                                     </div>
@@ -160,7 +168,7 @@
             </div>
         </div>
         <div class="modal" tabIndex="-1" role="dialog" id="fraud-modal">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Prediction Explanation</h5>
@@ -177,6 +185,63 @@
                                     <strong>Fraud Likely</strong> ({{prediction['probability']}}% confidence)
                                 {% endif %}
                             </p>
+                            <h5>Minimum changes for another outcome</h5>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Feature</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Influence</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {%- for feature in contrastive['pertinent_negative'] -%}
+                                    {% if feature['importance'] | int > 0 -%}
+                                        <tr>
+                                            <td>{{feature['feature_name']}}</td>
+                                            <td>
+                                                {% if feature['feature_value'] | int == 1 %}
+                                                    <strong>True</strong>
+                                                {% else %}
+                                                    <strong>False</strong>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{(feature['importance'])|float|round(3)}}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor -%}
+                                </tbody>
+                            </table>
+                            <p>If the feature values were set to these values, the prediction would change. This is the minimum set of changes in feature values to generate a different prediction. Each feature value is changed so that it moves towards its median value in the training data.</p>
+                            <h5>Maximum changes allowed for the same outcome</h5>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Feature</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Influence</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {%- for feature in contrastive['pertinent_positive'] -%}
+                                    {% if feature['importance'] | int > 0 -%}
+                                        <tr>
+                                            <td>{{feature['feature_name']}}</td>
+                                            <td>
+                                                {% if feature['feature_value'] | int == 1 %}
+                                                    <strong>True</strong>
+                                                {% else %}
+                                                    <strong>False</strong>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{(feature['importance'])|float|round(3)}}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor -%}
+                                </tbody>
+                            </table>
+                            <p>The prediction will not change even if the feature values are set to these values. This is the maximum change allowed while maintaining the existing prediction. Each feature value is changed so that it moves towards its median value in the training data.</p>
+                            <hr/>
                             <h5>Supporting Factors</h5>
                             <table class="table">
                                 <thead>
@@ -257,7 +322,6 @@
                 </div>
             </div>
         </div>
-    <!--    <FraudModal prediction={null}/>-->
     </div>
 </div>
 
