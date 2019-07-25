@@ -7,6 +7,8 @@ import pandas as pd
 import os
 
 
+# Global variables for our web app. the ai_client and subscription variables will be used to connect to our
+# Watson OpenScale instance and access the Python APIs.
 app = Flask(__name__)
 CORS(app)
 ai_client = None
@@ -14,6 +16,7 @@ subscription = None
 
 
 def connect_wos_client():
+    # Use the provided Cloud API key from the credentials.json file to connect to Watson OpenScale.
     global ai_client
     global subscription
     try:
@@ -29,11 +32,13 @@ def connect_wos_client():
         }
         ai_client = APIClient(aios_credentials=wos_credentials)
         version = ai_client.version
+        # Get the subscription for our specific Fraud Prediction model.
         subscription = ai_client.data_mart.subscriptions.get(name='SKLearn Fraud Prediction')
     return version
 
 
 def clean_factor_text(to_clean):
+    # Make the list of model features more human-readable.
     cleaned = to_clean.replace("EXCESSIVE_CLAIM_AMOUNT", "Claim Amount")
     cleaned = cleaned.replace("EXPIRED_LICENSE", "License Status")
     cleaned = cleaned.replace("TOO_MANY_CLAIMS", "Number of Claims")
@@ -50,10 +55,13 @@ def index():
 
 @app.route('/claim/<claim_id>')
 def claim(claim_id):
+    # Ensure that we have a valid client and subscription.
     connect_wos_client()
 
+    # Use the subscription to get our explanation data as a pandas dataframe.
     explain_table = subscription.explainability.get_table_content()
     try:
+        # Retreive the specific explanation from the dataframe as a Python dict, and split out the required data.
         raw_data = explain_table.loc[explain_table.transaction_id == claim_id + '-1'].to_dict(orient="list")['explanation'][0]['entity']
         predictions = raw_data['predictions']
         feature_values = raw_data['input_features']
@@ -68,16 +76,21 @@ def claim(claim_id):
             if factor['weight'] > 0:
                 factors.append({'name': clean_factor_text(factor['feature_name']), 'weight': int(factor['weight'] * 100)})
 
+        # Get the other relevant claim, driver, weather, and location data from our data.json file.
+        # In a production application, this would come from one or more database queries or RESTful API calls.
+        # For simplicity in setting up the demo, we will use a static json file.
         for driver in driver_data:
             if driver["claim_id"] == claim_id:
                 return render_template('claim.html', driver=driver, prediction=prediction, factors=factors, feature_values=feature_values, contrastive=contrastive, claim_id=claim_id)
         return "Claim ID not found"
     except IndexError:
-        pass
+        return "No explanation available"
 
 
 @app.route('/store_feedback', methods=['POST'])
 def store_feedback():
+    # Use the OpenScale Python API to store feedback data so we can score our model for accuracy, and improve it
+    # over time.
     global subscription
     print('Storing feedback for claim', request.form.get('claim_id'))
     fields = ['SUSPICIOUS_CLAIM_TIME','EXPIRED_LICENSE','LOW_MILES_AT_LOSS','EXCESSIVE_CLAIM_AMOUNT','TOO_MANY_CLAIMS','NO_POLICE','FLAG_FOR_FRAUD_INV']
@@ -94,6 +107,7 @@ def store_feedback():
     return redirect(url_for('claim', claim_id=request.form.get('claim_id')))
 
 
+# Get the static driver, policy, claim and other data from our json file.
 driver_data = json.load(open(os.path.join(app.root_path, 'data.json')))
 
 if __name__ == '__main__':
