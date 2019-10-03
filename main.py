@@ -65,7 +65,10 @@ def claim(claim_id):
         raw_data = explain_table.loc[explain_table.transaction_id == claim_id + '-1'].to_dict(orient="list")['explanation'][0]['entity']
         predictions = raw_data['predictions']
         feature_values = raw_data['input_features']
-        contrastive = raw_data['contrastive_explanations']
+        try:
+            contrastive = raw_data['contrastive_explanations']
+        except KeyError:
+            contrastive = {"pertinent_negative": [], "pertinent_positive": []}
         prediction = None
         for possibility in predictions:
             if "probability" in possibility and possibility["probability"] > 0.50:
