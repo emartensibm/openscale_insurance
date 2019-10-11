@@ -195,7 +195,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {%- for feature in contrastive['pertinent_negative'] -%}
+                                {%- for feature in contrastive['pertinent_negative_features'] -%}
                                     {% if feature['importance'] | int > 0 -%}
                                         <tr>
                                             <td>{{feature['feature_name']}}</td>
@@ -223,7 +223,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {%- for feature in contrastive['pertinent_positive'] -%}
+                                {%- for feature in contrastive['pertinent_positive_features'] -%}
                                     {% if feature['importance'] | int > 0 -%}
                                         <tr>
                                             <td>{{feature['feature_name']}}</td>
@@ -252,7 +252,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for factor in prediction['explanation'] %}
+                                {% for factor in prediction['explanation_features'] %}
                                     {% if factor['weight'] > 0 -%}
                                         <tr>
                                             <td>{{factor['feature_name']}}</td>
@@ -283,7 +283,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for factor in prediction['explanation'] %}
+                                {% for factor in prediction['explanation_features'] %}
                                     {% if factor['weight'] < 0 -%}
                                         <tr>
                                             <td>{{factor['feature_name']}}</td>
