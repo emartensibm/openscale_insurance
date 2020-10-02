@@ -1,3 +1,4 @@
 Flask
 flask-cors
-ibm-ai-openscale
+ibm-watson-openscale
+ibm-cloud-sdk-core
